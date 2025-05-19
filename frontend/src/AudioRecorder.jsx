@@ -4,6 +4,7 @@ import axios from 'axios';
 const AudioRecorder = () => {
   const [recording, setRecording] = useState(false);
   const [transcript, setTranscript] = useState('');
+  const [llmResponse, setLlmResponse] = useState('');
   const mediaRecorderRef = useRef(null);
   const audioChunks = useRef([]);
 
@@ -24,8 +25,10 @@ const AudioRecorder = () => {
       formData.append('file', audioBlob, 'audio.webm');
 
       try {
-        const res = await axios.post('http://localhost:8000/transcribe', formData);
-        setTranscript(res.data.text);
+        const res = await axios.post('http://127.0.0.1:8000/chat/transcribe', formData);
+        console.log(res.data);
+        setTranscript(res.data.transcription);
+        setLlmResponse(res.data.chat_response.response);
       } catch (err) {
         console.error(err);
         setTranscript('Error transcribing audio.');
@@ -49,6 +52,9 @@ const AudioRecorder = () => {
       <div>
         <h3>Transcript:</h3>
         <p>{transcript}</p>
+        <h3>LLM Response:</h3>
+        <p>{llmResponse}</p>
+
       </div>
     </div>
   );
